@@ -22,7 +22,8 @@
             android:id="@+id/searchbtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/searchbtn"/>
+            android:src="@drawable/searchbtn"
+            android:layout_gravity="right"/>
     </FrameLayout>
 
 </LinearLayout>
