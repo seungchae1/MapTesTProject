@@ -47,7 +47,8 @@ public class MainActivity extends AppCompatActivity
     private LatLng mDestination;
     private Polyline mPolyline;
     ArrayList<LatLng> mMarkerPoints;
-
+    PolylineOptions options = new PolylineOptions();
+    List<Polyline> polylines;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,20 +93,30 @@ public class MainActivity extends AppCompatActivity
     protected void search(List<Address> addresses) {
         Address address = addresses.get(0);
         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-
+        LatLng P = new LatLng(35.17731148171244, 136.90706992119397);
         String addressText = String.format(
                 "%s, %s",
                 address.getMaxAddressLineIndex() > 0 ? address
                         .getAddressLine(0) : " ", address.getFeatureName());
-
+        Location a = new Location("a");
+        Location b = new Location("b");
+        a.setLatitude(latLng.latitude);
+        b.setLatitude(P.latitude);
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title(addressText);
+        float res = a.distanceTo(b);
+        markerOptions.snippet(res+"");
 
         mMap.clear();
         mMap.addMarker(markerOptions);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(18));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        //mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18));
+
+        addPath(latLng);
+        drawPath();
+
     }
     @Override
     public void onMapReady(final GoogleMap googleMap) {
@@ -116,15 +127,22 @@ public class MainActivity extends AppCompatActivity
         LatLng P = new LatLng(35.17731148171244, 136.90706992119397);
         markerOptions.position(P);
         markerOptions.title("나고야시");
-        markerOptions.snippet("나고야시");
+        //markerOptions.snippet("나고야시");
         mMap.addMarker(markerOptions);
 
         // 기존에 사용하던 다음 2줄은 문제가 있습니다.
         // CameraUpdateFactory.zoomTo가 오동작하네요.
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(SEOUL));
         //mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(P, 15));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(P, 18));
 
     }
-
+    private void addPath(LatLng newlat){        //polyline을 그려주는 메소드
+        options.add(newlat);
+    }
+    private void drawPath(){        //polyline을 그려주는 메소드
+        options.width(15).color(Color.BLACK).geodesic(true);
+        polylines.add(mMap.addPolyline(options));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(options.getPoints().get(1), 18/options.getPoints().size()));
+    }
 }
